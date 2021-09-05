@@ -24,7 +24,7 @@ namespace WindowsFormsGraficsMyName
         int coefficientHeight;
 
         const string FamilyName = "Arial";
-        const string MyName = "Коробкова Татьяна";
+        const string MyName = "Султанов Дим Жамилевич";
 
         public Form1()
         {
