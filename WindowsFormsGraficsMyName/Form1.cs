@@ -12,17 +12,81 @@ namespace WindowsFormsGraficsMyName
 {
     public partial class Form1 : Form
     {
-
-        Bitmap bitmap;
         Graphics grafics;
+        const float PointDefolt = 50;
+
+        /* Дополнительное значение для лучшей визуального выравнивания. Чтобы не работать сильно с дробями.*/
+        const int FloatingConstantHeight = 1; 
+        const int FloatingConstantWidth = 1;
+
+        /* Коэффициент для поиска подходящего point в зависемости от размера формы */
+        int coefficientWidth;
+        int coefficientHeight;
+
+        const string FamilyName = "Arial";
+        const string MyName = "Коробкова Татьяна";
 
         public Form1()
         {
             InitializeComponent();
-            
         }
 
-        public void FunctDrawMyName(int width = 0, int hight = 0, string fio="")
+
+        private int coefficientWidthFunct(Size sizeForm, string mes, string familyName)
+        {
+            Graphics g;
+            float fontPoint = PointDefolt;
+            Font fnt = new System.Drawing.Font(familyName, fontPoint);
+            Brush br = new SolidBrush(Color.Red);
+            Point pt = new Point(0, 0);
+
+            Form form = new Form();
+            form.Size = sizeForm;
+
+            g = form.CreateGraphics();
+
+            SizeF stringSize = new SizeF();
+            stringSize = g.MeasureString(mes, fnt);
+
+            while (stringSize.Width >= form.ClientSize.Width)
+            {
+                fontPoint -= 1;
+                fnt = new System.Drawing.Font(familyName, fontPoint);
+                stringSize = g.MeasureString(mes, fnt);
+            }
+
+            return (int)Math.Floor(form.Width / fontPoint) + FloatingConstantWidth;
+
+        }
+
+        private int coefficientHeightFunct(Size sizeForm, string mes, string familyName)
+        {
+            Graphics g;
+            float fontPoint = PointDefolt;
+            Font fnt = new System.Drawing.Font(familyName, fontPoint);
+            Brush br = new SolidBrush(Color.Red);
+            Point pt = new Point(0, 0);
+
+            Form form = new Form();
+            form.Size = sizeForm;
+
+            g = form.CreateGraphics();
+            //g.DrawString(mes, fnt, br, pt);
+
+            SizeF stringSize = new SizeF();
+            stringSize = g.MeasureString(mes, fnt);
+
+            while (stringSize.Height >= form.Height)
+            {
+                fontPoint -= 1;
+                fnt = new System.Drawing.Font(familyName, fontPoint);
+                stringSize = g.MeasureString(mes, fnt);
+            }
+
+            return (int)Math.Floor(form.Height / fontPoint) + FloatingConstantHeight;
+        }
+
+        public void FunctDrawMyName(int width, int hight, string fio, string familyName, int kw, int kh)
         {
             /*
              * point = 50;
@@ -39,20 +103,20 @@ namespace WindowsFormsGraficsMyName
             float fontW;
             float fontH;
 
-            if (width < 0 || hight < 0)
+            if (width < 0 || hight < 0 || kw <= 1 || kh <= 1)
                 return;
 
             int lenWord = fio.Length;
 
-            fontW = width / 10;
-            fontH = hight / 3;
+            fontW = width / kw;
+            fontH = hight / kh;
 
             if (fontW > fontH)
                 font = fontH;
             else
                 font = fontW;
 
-            Font fnt = new System.Drawing.Font("Arial", font);
+            Font fnt = new System.Drawing.Font(familyName, font);
             Brush br = new SolidBrush(Color.Red);
             Point pt = new Point(0, 0);
 
@@ -83,8 +147,7 @@ namespace WindowsFormsGraficsMyName
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            
-            FunctDrawMyName(this.Width, this.Height, "Султанов Дим");
+            FunctDrawMyName(this.Width, this.Height, MyName, FamilyName, coefficientWidth, coefficientHeight);
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -99,12 +162,14 @@ namespace WindowsFormsGraficsMyName
 
         private void Form1_ResizeEnd(object sender, EventArgs e)
         {
-            FunctDrawMyName(this.Width, this.Height, "Султанов Дим");
+            FunctDrawMyName(this.Width, this.Height, MyName, FamilyName, coefficientWidth, coefficientHeight);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+            Size formSize = this.ClientSize;
+            coefficientHeight = coefficientHeightFunct(formSize, MyName, FamilyName);
+            coefficientWidth = coefficientWidthFunct(formSize, MyName, FamilyName);
         }
 
         private void Form1_Shown(object sender, EventArgs e)
